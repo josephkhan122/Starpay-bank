@@ -1,80 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StarPay Bank - Payment</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StarPay Bank</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=ASO7RpqCJFXqFOMEGuvUpHZ6WZuQCICd748GrtYyVAEzwg8OcC8J3oot8N9ANsQbCpf2lKasmzf_g_MT&currency=GBP"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
 
-    <!-- PayPal SDK Script -->
-    <script src="https://www.paypal.com/sdk/js?client-id=ASO7RpqCJFXqFOMEGuvUpHZ6WZuQCICd748GrtYyVAEzwg8OcC8J3oot8N9ANsQbCpf2lKasmzf_g_MT&currency=GBP" data-namespace="paypal_sdk"></script>
+    h1 {
+      font-size: 3rem;
+      text-shadow: 0 0 10px #0ff;
+    }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            padding: 20px;
-        }
-        #money-dashboard {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        #paypal-button-container {
-            margin-top: 20px;
-        }
-    </style>
+    #balance {
+      margin: 20px 0;
+      padding: 15px 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      font-size: 1.5rem;
+      box-shadow: 0 0 10px #00ffff;
+    }
+
+    #paypal-button-container {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #00ffff;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00dddd;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>StarPay Bank</h1>
+  <h1>StarPay Bank</h1>
 
-    <div id="money-dashboard">
-        <h3>Your Balance: <span id="balance">£0.00</span></h3>
-        <p>Ready to make a payment?</p>
+  <div id="balance">Balance: £0.00</div>
 
-        <!-- Input for User to Enter Payment Amount -->
-        <label for="payment-amount">Enter Amount to Pay (GBP):</label>
-        <input type="number" id="payment-amount" placeholder="Amount in GBP" min="1" step="any" />
+  <div>
+    <input type="text" id="amountInput" placeholder="Enter amount" />
+    <button onclick="addMoney()">Add Money</button>
+  </div>
 
-        <!-- PayPal Button for Payments -->
-        <div id="paypal-button-container"></div>
-    </div>
-</div>
+  <div id="paypal-button-container"></div>
 
-<script>
-    // PayPal Button Setup
+  <script>
+    let balance = 0.00;
+
+    function updateBalanceDisplay() {
+      document.getElementById("balance").textContent = `Balance: £${balance.toFixed(2)}`;
+    }
+
+    function addMoney() {
+      const amount = parseFloat(document.getElementById("amountInput").value);
+      if (!isNaN(amount) && amount > 0) {
+        balance += amount;
+        updateBalanceDisplay();
+      } else {
+        alert("Enter a valid amount!");
+      }
+    }
+
     paypal.Buttons({
-        createOrder: function(data, actions) {
-            // Get payment amount from user input
-            const amount = document.getElementById('payment-amount').value || '0.00'; // default to '0.00' if empty
-
-            // Create the order on PayPal with the specified amount
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: amount
-                    }
-                }]
-            });
-        },
-        onApprove: function(data, actions) {
-            // Capture the payment once the user approves
-            return actions.order.capture().then(function(details) {
-                alert('Payment successful! Thank you, ' + details.payer.name.given_name);
-            });
-        },
-        onError: function(err) {
-            console.error('Error during payment: ', err);
-            alert('There was an error with your payment. Please try again later.');
-        }
-    }).render('#paypal-button-container'); // Render the PayPal button in the container
-</script>
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '100.00' // Default top-up amount, can be changed
+            }
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert('Payment successful: ' + details.payer.name.given_name);
+          balance += 100.00;
+          updateBalanceDisplay();
+        });
+      }
+    }).render('#paypal-button-container');
+  </script>
 
 </body>
-</html> 
+</html>
