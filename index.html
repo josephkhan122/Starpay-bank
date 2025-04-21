@@ -1,66 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StarPay Bank</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    #paypal-button-container {
-      margin-top: 20px;
-    }
-    .balance {
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarPay Bank</title>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ASO7RpqCJFXqFOMEGuvUpHZ6WZuQCICd748GrtYyVAEzwg8OcC8J3oot8N9ANsQbCpf2lKasmzf_g_MT&currency=GBP" data-namespace="paypal_sdk"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            padding: 20px;
+        }
+        .login-btn {
+            margin: 20px 0;
+        }
+        #money-dashboard {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #paypal-button-container {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Welcome to StarPay Bank!</h1>
-  <p>Start by adding money to your account:</p>
 
-  <div id="paypal-button-container"></div>
+<div class="container">
+    <h1>Welcome to StarPay Bank</h1>
+    
+    <!-- Google Sign-In Button -->
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
 
-  <div class="balance">
-    <p>Balance: £0.00</p>
-  </div>
+    <!-- User Info Display After Google Sign-In -->
+    <div id="user-info" style="display:none;">
+        <h2>Account Dashboard</h2>
+        <p>Welcome, <span id="user-name"></span>!</p>
+        <div id="money-dashboard">
+            <h3>Your Balance: <span id="balance">£0.00</span></h3>
+            <p>Ready to manage your money?</p>
+            
+            <!-- Input for User to Enter Payment Amount -->
+            <label for="payment-amount">Enter Amount to Pay (GBP):</label>
+            <input type="number" id="payment-amount" placeholder="Amount in GBP" min="1" step="any" />
 
-  <!-- Load PayPal's JS SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AVXl0Eumqtuq-p1PVLpSb5RDyhrwm9ie-YvbygRzE0j4OBEUJr8PYcMsSj9reZ4xRrlFlRf8QdADyTjP&currency=GBP"></script>
+            <!-- PayPal Button for Payments -->
+            <div id="paypal-button-container"></div>
+        </div>
+    </div>
+</div>
 
-  <script>
-    // Initial balance for demo
-    let balance = 0;
+<script>
+    // Google Sign-In function
+    function onSignIn(googleUser) {
+        const profile = googleUser.getBasicProfile();
+        const userName = profile.getName();
+        
+        // Display user info after login
+        document.getElementById('user-name').innerText = userName;
+        document.getElementById('user-info').style.display = 'block';
+        document.querySelector('.g-signin2').style.display = 'none';
+    }
 
-    // PayPal button configuration
+    // PayPal Button Setup
     paypal.Buttons({
-      createOrder: function(data, actions) {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: '10.00' // Amount to be added (this can be dynamic)
+        createOrder: function(data, actions) {
+            // Get payment amount from user input
+            const amount = parseFloat(document.getElementById('payment-amount').value);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
             }
-          }]
-        });
-      },
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-          // After payment is approved, simulate balance update
-          alert('Payment successful from ' + details.payer.name.given_name + '!');
 
-          // Add money to the balance (can modify this logic as needed)
-          balance += 10;  // Simulate adding £10
-
-          // Update the displayed balance
-          document.querySelector(".balance p").textContent = `Balance: £${balance.toFixed(2)}`;
-        });
-      }
+            // Create the order with the entered amount
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: amount.toFixed(2) // Set the dynamic amount from user input
+                    }
+                }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                alert('Transaction completed by ' + details.payer.name.given_name);
+                // Update balance after successful payment
+                const currentBalance = parseFloat(document.getElementById('balance').innerText.replace('£', ''));
+                const paymentAmount = parseFloat(document.getElementById('payment-amount').value);
+                document.getElementById('balance').innerText = '£' + (currentBalance + paymentAmount).toFixed(2); // Update balance
+            });
+        }
     }).render('#paypal-button-container');
-  </script>
+</script>
+
 </body>
 </html>
