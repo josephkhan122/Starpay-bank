@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StarPay Bank</title>
-
-    <!-- Google Sign-In Script -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <title>StarPay Bank - Payment</title>
 
     <!-- PayPal SDK Script -->
     <script src="https://www.paypal.com/sdk/js?client-id=ASO7RpqCJFXqFOMEGuvUpHZ6WZuQCICd748GrtYyVAEzwg8OcC8J3oot8N9ANsQbCpf2lKasmzf_g_MT&currency=GBP" data-namespace="paypal_sdk"></script>
@@ -20,9 +17,6 @@
         }
         .container {
             padding: 20px;
-        }
-        .login-btn {
-            margin: 20px 0;
         }
         #money-dashboard {
             background-color: #fff;
@@ -38,41 +32,22 @@
 <body>
 
 <div class="container">
-    <h1>Welcome to StarPay Bank</h1>
-    
-    <!-- Google Sign-In Button -->
-    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <h1>StarPay Bank</h1>
 
-    <!-- User Info Display After Google Sign-In -->
-    <div id="user-info" style="display:none;">
-        <h2>Account Dashboard</h2>
-        <p>Welcome, <span id="user-name"></span>!</p>
-        <div id="money-dashboard">
-            <h3>Your Balance: <span id="balance">£0.00</span></h3>
-            <p>Ready to manage your money?</p>
-            
-            <!-- Input for User to Enter Payment Amount -->
-            <label for="payment-amount">Enter Amount to Pay (GBP):</label>
-            <input type="number" id="payment-amount" placeholder="Amount in GBP" min="1" step="any" />
+    <div id="money-dashboard">
+        <h3>Your Balance: <span id="balance">£0.00</span></h3>
+        <p>Ready to make a payment?</p>
 
-            <!-- PayPal Button for Payments -->
-            <div id="paypal-button-container"></div>
-        </div>
+        <!-- Input for User to Enter Payment Amount -->
+        <label for="payment-amount">Enter Amount to Pay (GBP):</label>
+        <input type="number" id="payment-amount" placeholder="Amount in GBP" min="1" step="any" />
+
+        <!-- PayPal Button for Payments -->
+        <div id="paypal-button-container"></div>
     </div>
 </div>
 
 <script>
-    // Google Sign-In function
-    function onSignIn(googleUser) {
-        const profile = googleUser.getBasicProfile();
-        const userName = profile.getName();
-        
-        // Display user info after login
-        document.getElementById('user-name').innerText = userName;
-        document.getElementById('user-info').style.display = 'block';
-        document.querySelector('.g-signin2').style.display = 'none';
-    }
-
     // PayPal Button Setup
     paypal.Buttons({
         createOrder: function(data, actions) {
