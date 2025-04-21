@@ -83,7 +83,7 @@
 
     function addMoney() {
       const amount = parseFloat(document.getElementById("amountInput").value);
-      if (!isNaN(amount) && amount > 0) {
+      if (!isNaN(amount) && amount > 100) {
         balance += amount;
         updateBalanceDisplay();
       } else {
@@ -104,7 +104,7 @@
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
           alert('Payment successful: ' + details.payer.name.given_name);
-          balance += 100.00;
+          balance += 0.00
           updateBalanceDisplay();
         });
       }
