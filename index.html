@@ -65,7 +65,7 @@
 
   <h1>StarPay Bank</h1>
 
-  <div id="balance">Balance: £0.00</div>
+  <div id="balance">Balance: £100.00</div>
 
   <div>
     <input type="text" id="amountInput" placeholder="Enter amount" />
@@ -75,7 +75,7 @@
   <div id="paypal-button-container"></div>
 
   <script>
-    let balance = 0.00;
+    let balance = 100.00;
 
     function updateBalanceDisplay() {
       document.getElementById("balance").textContent = `Balance: £${balance.toFixed(2)}`;
@@ -96,7 +96,7 @@
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: '100.00' // Default top-up amount, can be changed
+              value: '£0.00' // Default top-up amount, can be changed
             }
           }]
         });
